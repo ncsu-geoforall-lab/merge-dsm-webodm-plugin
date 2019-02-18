@@ -5,7 +5,7 @@ from app.plugins import PluginBase, MountPoint
 from django.contrib.auth.decorators import login_required
 from django import forms
 
-from plugins.dsmcorrect.api import TaskDSMCorrect
+from plugins.merge_dsm_webodm_plugin.api import TaskDSMCorrect
 
 
 class Plugin(PluginBase):
@@ -20,22 +20,9 @@ class Plugin(PluginBase):
         return ['style.css']
 
     def app_mount_points(self):
-        def load_buttons_cb(request):
-            return True
-        #     if request.user.is_authenticated:
-        #         ds = self.get_user_data_store(request.user)
-        #         token = ds.get_string('token')
-        #         if token == '':
-        #             return False
-
-        #         return {'token': token}
-        #     else:
-        #         return False
-
         return [
             MountPoint('main.js$', self.get_dynamic_script(
-                    'load_buttons.js',
-                    load_buttons_cb
+                    'load_buttons.js'
                 )
             )
         ]    

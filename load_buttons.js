@@ -1,6 +1,6 @@
 
 PluginsAPI.Dashboard.addTaskActionButton([
-    'dsmcorrect/build/DSMCorrectButton.js'
+    'merge_dsm_webodm_plugin/build/DSMCorrectButton.js'
 ],function(args, DSMCorrectButton){
     var task = args.task;
 

@@ -1,3 +1,8 @@
+/**
+ * Run ./webodm.sh restart to have webpack rebuild the file
+ */
+
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import Storage from 'webodm/classes/Storage';
@@ -49,7 +54,7 @@ export default class DSMCorrectButton extends React.Component{
         // };
 
         return $.ajax({
-            url: `/api/plugins/dsmcorrect/task/${task.id}/dsmcorrect`,
+            url: `/api/plugins/merge_dsm_webodm_plugin/task/${task.id}/dsmcorrect`,
             contentType: 'application/json',
             dataType: 'json',
             type: 'GET'
