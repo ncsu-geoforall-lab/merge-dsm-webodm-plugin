@@ -1,1 +1,6 @@
-echo "Hello"
+r.external input=${dsm_file} output=dsm --overwrite
+mkdir `dirname ${dsm_file}`/../grass
+r.external.out directory=`dirname ${dsm_file}`/../grass format="GTiff"
+g.region raster=dsm
+r.relief input=dsm output=relief --o
+r.univar relief -g|grep max

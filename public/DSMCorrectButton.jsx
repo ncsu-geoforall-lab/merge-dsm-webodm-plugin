@@ -54,19 +54,21 @@ export default class DSMCorrectButton extends React.Component{
         // };
 
         return $.ajax({
-            url: `/api/plugins/merge_dsm_webodm_plugin/task/${task.id}/dsmcorrect`,
+            url: `/api/plugins/dsmcorrect/task/${task.id}/dsmcorrect`,
             contentType: 'application/json',
             dataType: 'json',
             type: 'GET'
-          }).done(taskInfo => {
-            // Allow a user to associate the sensor name coming from the EXIF tags
-            // to one that perhaps is more human readable.
-            // Storage.setItem("oam_sensor_pref_" + taskInfo.sensor, formData.sensor);
-            // Storage.setItem("oam_provider_pref", formData.provider);
-
-            this.setState({taskInfo});
-            this.monitorProgress();
-          });
+            }).done(taskInfo => {
+                if (taskInfo.max){
+                    this.setState({max: parseFloat(taskInfo.max)});
+                }else if (taskInfo.error){
+                    this.setState({error: taskInfo.error});
+                }else{
+                    this.setState({error: "Invalid response: " + taskInfo});
+                }
+            }).fail(error => {
+                this.setState({error});
+            });
     }
 
 

@@ -12,9 +12,6 @@ from worker.tasks import execute_grass_script
 from app.plugins.grass_engine import grass, GrassEngineException
 from geojson import Feature, Point, FeatureCollection
 
-class GeoJSONSerializer(serializers.Serializer):
-    area = serializers.JSONField(help_text="Polygon contour defining the volume area to compute")
-
 
 class TaskDSMCorrect(TaskView):
     def get(self, request, pk=None):
@@ -23,17 +20,11 @@ class TaskDSMCorrect(TaskView):
         if task.dsm_extent is None:
             return Response({'error': 'No surface model available. From the Dashboard, select this task, press Edit, from the options make sure to check "dsm", then press Restart --> From DEM.'})
 
-        serializer = GeoJSONSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
-        area = serializer['area'].value
-        points = FeatureCollection([Feature(geometry=Point(coords)) for coords in area['geometry']['coordinates'][0]])
         dsm = os.path.abspath(task.get_asset_download_path("dsm.tif"))
 
         try:
             context = grass.create_context()
-            context.add_file('area_file.geojson', json.dumps(area))
-            context.add_file('points_file.geojson', str(points))
             context.add_param('dsm_file', dsm)
             context.set_location(dsm)
 
@@ -43,14 +34,15 @@ class TaskDSMCorrect(TaskView):
             ), context.serialize()).get()
             if isinstance(output, dict) and 'error' in output: raise GrassEngineException(output['error'])
 
-            cols = output.split(':')
-            if len(cols) == 7:
-                return Response({'volume': str(abs(float(cols[6])))}, status=status.HTTP_200_OK)
+            rows = output.split('\n')
+            cols = rows[0].split('=')
+            if len(cols) == 2:
+                return Response({'max': str(float(cols[1]))
+				}, status=status.HTTP_200_OK)
             else:
                 raise GrassEngineException(output)
         except GrassEngineException as e:
             return Response({'error': str(e)}, status=status.HTTP_200_OK)
-
 
 
 
