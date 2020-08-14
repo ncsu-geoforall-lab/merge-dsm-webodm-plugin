@@ -1,4 +1,4 @@
-r.external input=${dsm_file} output=dsm --overwrite
+r.external input=dsm_file output=dsm --overwrite
 mkdir `dirname ${dsm_file}`/../grass
 r.external.out directory=`dirname ${dsm_file}`/../grass format="GTiff"
 g.region raster=dsm

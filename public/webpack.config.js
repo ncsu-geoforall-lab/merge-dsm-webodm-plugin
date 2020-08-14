@@ -1,16 +1,18 @@
 // Magic to include node_modules of root WebODM's directory
-process.env.NODE_PATH = "../../../node_modules";
+const fs = require('fs');
+let webodmRoot = "../../../"; // Assuming plugins/<name>/public
+if (!fs.existsSync(webodmRoot + "webodm.sh")) webodmRoot = "../../../../../"; // Assuming app/media/plugins/<name>/public
+process.env.NODE_PATH = webodmRoot + "node_modules";
 require("module").Module._initPaths();
 
 let path = require("path");
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
-let LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   mode: 'production',
   context: __dirname,
 
-  entry: {"DSMCorrectButton": ["./DSMCorrectButton.jsx"]},
+  entry: {"rapid-dsm": ["./rapid-dsm.jsx"]},
 
   output: {
       path: path.join(__dirname, './build'),
@@ -19,7 +21,6 @@ module.exports = {
   },
 
   plugins: [
-    new LiveReloadPlugin(),
     new ExtractTextPlugin('[name].css', {
         allChunks: true
     })
@@ -49,7 +50,15 @@ module.exports = {
       {
         test: /\.s?css$/,
         use: ExtractTextPlugin.extract({
-          use: 'css-loader!sass-loader'
+          use: [
+            { loader: 'css-loader' },
+            {
+                loader: 'sass-loader',
+                options: {
+                    implementation: require("sass")
+                }
+            }
+          ]
         })
       },
       {
@@ -63,7 +72,7 @@ module.exports = {
     modules: ['node_modules', 'bower_components'],
     extensions: ['.js', '.jsx'],
     alias: {
-        webodm: path.resolve(__dirname, '../../../app/static/app/js')
+        webodm: path.resolve(__dirname, webodmRoot + 'app/static/app/js')
     }
   },
 
@@ -76,5 +85,11 @@ module.exports = {
     "leaflet": "leaflet",
     "ReactDOM": "ReactDOM",
     "React": "React"
+  },
+
+  watchOptions: {
+    ignored: ['node_modules', './**/*.py'],
+    aggregateTimeout: 300,
+    poll: 1000
   }
 }

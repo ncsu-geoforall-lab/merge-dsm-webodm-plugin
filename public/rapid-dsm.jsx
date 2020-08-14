@@ -9,7 +9,7 @@ import Storage from 'webodm/classes/Storage';
 import ErrorMessage from 'webodm/components/ErrorMessage';
 import $ from 'jquery';
 
-export default class DSMCorrectButton extends React.Component{
+export default class RapidDSMButton extends React.Component{
     static defaultProps = {
         task: null
     };
@@ -40,7 +40,7 @@ export default class DSMCorrectButton extends React.Component{
 
     handleClick = () => {
         const { taskInfo } = this.state;
-        console.log('DSM Correct:', this);
+        console.log('Rapid-DSM:', this);
         const { task } = this.props;
 
         // const oamParams = {
@@ -54,7 +54,7 @@ export default class DSMCorrectButton extends React.Component{
         // };
 
         return $.ajax({
-            url: `/api/plugins/dsmcorrect/task/${task.id}/dsmcorrect`,
+            url: `/api/plugins/rapid-dsm/task/${task.id}/rapid-dsm`,
             contentType: 'application/json',
             dataType: 'json',
             type: 'GET'
@@ -91,8 +91,8 @@ export default class DSMCorrectButton extends React.Component{
         };
 
         const getButtonLabel = () => {
-            if (loading) return " DSM Correct";
-            else return " DSM Correct";
+            if (loading) return " Rapid-DSM";
+            else return " Rapid-DSM";
         }
 
         const result = [

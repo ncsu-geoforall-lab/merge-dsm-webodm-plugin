@@ -5,7 +5,7 @@ from app.plugins import PluginBase, MountPoint
 from django.contrib.auth.decorators import login_required
 from django import forms
 
-from plugins.merge_dsm_webodm_plugin.api import TaskDSMCorrect
+from .api import TaskRapidDSM
 
 
 class Plugin(PluginBase):
@@ -14,7 +14,7 @@ class Plugin(PluginBase):
         return ['main.js']
 
     def build_jsx_components(self):
-        return ['DSMCorrectButton.jsx']
+        return ['rapid-dsm.jsx']
 
     def include_css_files(self):
         return ['style.css']
@@ -29,5 +29,5 @@ class Plugin(PluginBase):
 
     def api_mount_points(self):
         return [
-            MountPoint('task/(?P<pk>[^/.]+)/dsmcorrect', TaskDSMCorrect.as_view())
+            MountPoint('task/(?P<pk>[^/.]+)/rapid-dsm', TaskRapidDSM.as_view())
         ]

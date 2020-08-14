@@ -1,11 +1,11 @@
 
 PluginsAPI.Dashboard.addTaskActionButton([
-    'merge_dsm_webodm_plugin/build/DSMCorrectButton.js'
-],function(args, DSMCorrectButton){
+    'rapid-dsm/build/rapid-dsm.js'
+],function(args, RapidDSMButton){
     var task = args.task;
 
     if (task.available_assets.indexOf("orthophoto.tif") !== -1){
-        return React.createElement(DSMCorrectButton, {task: task});
+        return React.createElement(RapidDSMButton, {task: task});
     }
 }
 );
