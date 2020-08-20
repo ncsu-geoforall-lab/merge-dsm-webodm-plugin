@@ -1,5 +1,5 @@
 import os
-
+import platform
 import json
 from rest_framework import serializers
 from rest_framework import status
@@ -8,10 +8,7 @@ from rest_framework.response import Response
 from app.plugins.views import TaskView
 
 from worker.tasks import execute_grass_script
-
-from app.plugins.grass_engine import grass, GrassEngineException
-from geojson import Feature, Point, FeatureCollection
-
+from app.plugins.grass_engine import grass, GrassEngineException,  cleanup_grass_context
 
 class TaskRapidDSM(TaskView):
     def get(self, request, pk=None):
@@ -23,14 +20,33 @@ class TaskRapidDSM(TaskView):
 
         dsm = os.path.abspath(task.get_asset_download_path("dsm.tif"))
 
+       
+
+        #     celery_task_id = execute_grass_script.delay(os.path.join(
+        #         os.path.dirname(os.path.abspath(__file__)),
+        #         "calc_volume.py"
+        #     ), context.serialize()).task_id
+
+        #     return Response({'celery_task_id': celery_task_id}, status=status.HTTP_200_OK)
+        # except GrassEngineException as e:
+        #     return Response({'error': str(e)}, status=status.HTTP_200_OK)
+        
         try:
-            context = grass.create_context()
+
+           
+            context = grass.create_context({
+                'auto_cleanup': False
+                })
+            env = os.environ.copy()
+            sep = ";" if platform.system() == "Windows" else ":"
+            env["PYTHONPATH"] = "%s%s%s" % (context.python_path, sep, env.get("PYTHONPATH", ""))
+            print("PYTHONPATH %s" % env["PYTHONPATH"] )
             context.add_param('dsm_file', dsm)
             context.set_location(dsm)
-
+            print(context.serialize())
             output = execute_grass_script.delay(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                "dsm_correct.grass"
+                "rapid-dsm.py"
             ), context.serialize()).get()
             if isinstance(output, dict) and 'error' in output: raise GrassEngineException(output['error'])
 

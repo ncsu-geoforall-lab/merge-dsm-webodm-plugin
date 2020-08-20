@@ -1,19 +1,5 @@
 #%module
-#% description: Calculate volume of area and prints the volume to stdout
-#%end
-#%option
-#% key: area_file
-#% type: string
-#% required: yes
-#% multiple: no
-#% description: Geospatial file containing the area to measure
-#%end
-#%option
-#% key: points_file
-#% type: string
-#% required: yes
-#% multiple: no
-#% description: Geospatial file containing the points defining the area
+#% description: Fuse UAS derived DSM into Lidar based DSM.
 #%end
 #%option
 #% key: dsm_file
@@ -23,12 +9,13 @@
 #% description: GeoTIFF DEM containing the surface
 #%end
 
+from __future__ import absolute_import
 import os
 import sys
 import atexit
 import grass.script as gs
 import grass.script.array as garray
-from sklearn.mixture import BayesianGaussianMixture as GMM
+# from sklearn.mixture import BayesianGaussianMixture as GMM
 import numpy as np
 from grass.pygrass.modules import Module
 
@@ -37,6 +24,10 @@ TMP_RAST = []
 TMP_VECT = []
 stddev_thr = 5
 mean_thr = 2
+
+# Install grass extensions
+Module("g.extension", extension="r.in.usgs")
+# gs.run_command("g.extension", extension="r.in.usgs")
 
 
 def import_dsm(output, output_dir, input_srs, resolution, nprocs):
@@ -217,6 +208,8 @@ def main(uas, dem, output, buffer):
 
 if __name__ == "__main__":
     os.environ["GRASS_OVERWRITE"] = "1"
+    opts, _ = gs.parser()
+    
     #Load DSM data from WebODM
     gs.run_command("r.external", input=opts['dsm_file'], output="uav", overwrite=True)
     uas_dsm = "uav"
